@@ -1,0 +1,6 @@
+@ProshoreRentalApp_HostAddress = http://localhost:5044
+
+GET {{ProshoreRentalApp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
