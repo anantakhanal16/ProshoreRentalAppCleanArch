@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Core.UseCase;
 using Core.Repositories;
 using Infrastructure.Data;
 
@@ -24,30 +25,62 @@ namespace Infrastructure.Implementation
 
         public async Task<IEnumerable<PropertyListing>> GetAllListingsAsync()
         {
-            return await _context.Property.ToListAsync();
+            return await _context.Property
+                .Include(p=>p.ContactDetails).
+                Include(p=>p.Images)
+                .
+                ToListAsync();
         }
 
         public async Task<PropertyListing> GetListingByIdAsync(int id)
         {
-            return await _context.Property.FindAsync(id);
+            var list= await _context.Property
+                .Include(p => p.ContactDetails)
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(p => p.Id == id);
+            return list;
         }
 
-        public async Task<PropertyListing> UpdateListingAsync(int id, PropertyListing listingDto)
+        public async Task<PropertyListing> UpdateListingAsync(int id, PropertyListing listingDTO)
         {
-            var existingListing = await _context.Property.FindAsync(id);
+            var existingListing = await _context.Property
+                .Include(p => p.ContactDetails)
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (existingListing == null)
             {
-                return null;
+                return null; 
             }
 
-            existingListing.PropertyType = listingDto.PropertyType;
-            existingListing.Location = listingDto.Location;
-            existingListing.Price = listingDto.Price;
-            existingListing.Features = listingDto.Features;
+            // Update specific properties directly
+            existingListing.PropertyType = listingDTO.PropertyType;
+            existingListing.Location = listingDTO.Location;
+            existingListing.Price = listingDTO.Price;
+            existingListing.Features = listingDTO.Features;
+
+            // Update or add ContactDetails if provided
+            if (listingDTO.ContactDetails != null)
+            {
+                existingListing.ContactDetails = existingListing.ContactDetails ?? new ContactDetails();
+                existingListing.ContactDetails.Name = listingDTO.ContactDetails.Name;
+                existingListing.ContactDetails.Email = listingDTO.ContactDetails.Email;
+                existingListing.ContactDetails.Phone = listingDTO.ContactDetails.Phone;
+            }
+
+            // Update or add Images if provided
+            if (listingDTO.Images != null)
+            {
+                existingListing.Images = listingDTO.Images.Select(imageDto => new PropertyImage
+                {
+                    ImageName = imageDto.ImageName,
+                    ImagePath = imageDto.ImagePath
+                }).ToList();
+            }
 
             await _context.SaveChangesAsync();
 
+            // Return the updated entity
             return existingListing;
         }
 
@@ -64,6 +97,20 @@ namespace Infrastructure.Implementation
             await _context.SaveChangesAsync();
 
             return existingListing;
+        }
+
+        public async Task<IEnumerable<PropertyListing>> SearchPropertiesAsync(PropertySearchCriteria criteria)
+        {
+            var query = _context.Property
+                        .Include(p => p.ContactDetails)
+                        .Include(p => p.Images)
+          .Where(p =>
+            (string.IsNullOrEmpty(criteria.Location) || p.Location.Contains(criteria.Location)) &&
+            (criteria.MinPrice == 0 || p.Price >= criteria.MinPrice) &&
+            (criteria.MaxPrice == 0 || p.Price <= criteria.MaxPrice) &&
+            (string.IsNullOrEmpty(criteria.PropertyType) || p.PropertyType == criteria.PropertyType));
+
+            return await query.ToListAsync();
         }
     }
 }

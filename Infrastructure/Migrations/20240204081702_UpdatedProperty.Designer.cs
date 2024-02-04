@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240204081702_UpdatedProperty")]
+    partial class UpdatedProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -110,7 +113,13 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("PropertyListingId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PropertyListingId")
+                        .IsUnique();
 
                     b.ToTable("ContactDetails");
                 });
@@ -122,10 +131,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ImageName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImagePath")
                         .IsRequired()
@@ -151,9 +156,12 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("AddedBy")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ContactDetailsId")
+                    b.Property<int>("Bathrooms")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Bedrooms")
                         .HasColumnType("int");
 
                     b.Property<string>("Features")
@@ -174,15 +182,9 @@ namespace Infrastructure.Migrations
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ContactDetailsId")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
+                    b.HasIndex("AddedBy");
 
                     b.ToTable("Property");
                 });
@@ -320,6 +322,17 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Core.Entities.ContactDetails", b =>
+                {
+                    b.HasOne("Core.Entities.PropertyListing", "PropertyListing")
+                        .WithOne("ContactDetails")
+                        .HasForeignKey("Core.Entities.ContactDetails", "PropertyListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PropertyListing");
+                });
+
             modelBuilder.Entity("Core.Entities.PropertyImage", b =>
                 {
                     b.HasOne("Core.Entities.PropertyListing", "PropertyListing")
@@ -333,17 +346,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Entities.PropertyListing", b =>
                 {
-                    b.HasOne("Core.Entities.ContactDetails", "ContactDetails")
-                        .WithOne()
-                        .HasForeignKey("Core.Entities.PropertyListing", "ContactDetailsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Core.Entities.ApplicationUser", "User")
                         .WithMany("PropertyListings")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("ContactDetails");
+                        .HasForeignKey("AddedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -406,6 +413,9 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Core.Entities.PropertyListing", b =>
                 {
+                    b.Navigation("ContactDetails")
+                        .IsRequired();
+
                     b.Navigation("Images");
                 });
 #pragma warning restore 612, 618

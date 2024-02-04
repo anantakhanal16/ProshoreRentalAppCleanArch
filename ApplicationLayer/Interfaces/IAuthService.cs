@@ -7,5 +7,6 @@ namespace ApplicationLayer.Interfaces
         Task<bool> RegisterAsync(ApplicationUser user, string password,string role);
         Task<bool> SignInAsync(string username, string password, bool rememberMe);
         Task SignOutAsync();
+        Task<ApplicationUser> GetUserDetails();
     }
 }

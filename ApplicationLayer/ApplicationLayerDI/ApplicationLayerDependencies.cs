@@ -9,7 +9,7 @@ namespace ApplicationLayer.ApplicationLayerDI
         public static IServiceCollection ApplicationServices(this IServiceCollection services)
         {
             services.AddTransient<IAuthService, AuthService>();
-        
+            services.AddScoped<IListingService, ListingService>();
             return services;
         }
     }

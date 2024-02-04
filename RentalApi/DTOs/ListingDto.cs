@@ -15,5 +15,9 @@ namespace RentalApi.DTOs
 
         [StringLength(1000, ErrorMessage = "Features cannot exceed 1000 characters")]
         public string Features { get; set; }
+
+        public ContactDetailsDto ContactDetails { get; set; }
+        public ImageDto ImageDetails { get; set; }
+
     }
 }

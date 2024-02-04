@@ -17,9 +17,9 @@ namespace ApplicationLayer.Service
             _roleManager = roleManager;
         }
 
-        public async Task<bool> RegisterAsync(ApplicationUser username, string password, string role)
+        public async Task<bool> RegisterAsync(ApplicationUser appUser, string password, string role)
         {
-            var user = new ApplicationUser { UserName = username.Email, Email = username.Email };
+            var user = new ApplicationUser { UserName = appUser.Email, Email = appUser.Email };
             var result = await _userManager.CreateAsync(user, password);
 
             if (result.Succeeded && !string.IsNullOrEmpty(role))
@@ -42,5 +42,14 @@ namespace ApplicationLayer.Service
         }
 
         public async Task SignOutAsync() => await _signInManager.SignOutAsync();
+
+        public async Task<ApplicationUser> GetUserDetails()
+        {
+            var user = await _userManager.GetUserAsync(_signInManager.Context.User);
+
+            return user;
+        }
+
+        
     }
 }

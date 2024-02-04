@@ -1,7 +1,5 @@
 using ApplicationLayer.ApplicationLayerDI;
 using Infrastructure.DependencyInjection;
-using Infrastructure.Implementation;
-using Infrastructure.RepoInterfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +21,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseStaticFiles();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

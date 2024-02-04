@@ -18,7 +18,7 @@ namespace RentalApi.Controllers
         }
 
 
-        [HttpPost("register-house-seeker")]
+        [HttpPost("Register-house-seeker")]
         public async Task<IActionResult> RegisterHouseSeeker([FromBody] RegisterModel model)
         {
             if (ModelState.IsValid)
@@ -43,7 +43,7 @@ namespace RentalApi.Controllers
         }
 
 
-        [HttpPost("register-as-broker")]
+        [HttpPost("Register-as-broker")]
         public async Task<IActionResult> RegisterAsBroker([FromBody] RegisterModel model)
         {
             if (ModelState.IsValid)
@@ -72,7 +72,7 @@ namespace RentalApi.Controllers
         }
        
         
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
             if (!ModelState.IsValid)
@@ -89,6 +89,19 @@ namespace RentalApi.Controllers
             }
 
             return BadRequest("Invalid login attempt");
+        }
+
+
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+         
+
+                 await _authService.SignOutAsync();
+
+                return Ok("Signout successful");
+            
+
         }
     }
 
