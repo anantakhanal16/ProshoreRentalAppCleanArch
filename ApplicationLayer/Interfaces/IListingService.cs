@@ -6,6 +6,7 @@ namespace ApplicationLayer.Interfaces
     public interface IListingService
     {
         Task<IEnumerable<PropertyListing>> GetAllListingsAsync();
+        Task<IEnumerable<PropertyListing>> GetAllListingsByUserId();
         Task<PropertyListing> GetListingByIdAsync(int id);
         Task<int> CreateListingAsync(PropertyListing listingDTO);
         Task<PropertyListing> UpdateListingAsync(int id, PropertyListing listingDto);

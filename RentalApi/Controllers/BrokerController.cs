@@ -24,7 +24,7 @@ namespace RentalApi.Controllers
         [HttpGet("GetAllProperty")]
         public async Task<IActionResult> GetListings()
         {
-            var listings = await _listingService.GetAllListingsAsync();
+            var listings = await _listingService.GetAllListingsByUserId();
 
 
             var propertyListingsDto = listings.Select(p => new ListingDto

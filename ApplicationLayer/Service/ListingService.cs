@@ -10,7 +10,7 @@ namespace ApplicationLayer.Service
         private readonly IListingRepository _listingRepository;
         private readonly IAuthService _authService;
 
-        public ListingService(IListingRepository listingRepository,IAuthService authService)
+        public ListingService(IListingRepository listingRepository, IAuthService authService)
         {
             _listingRepository = listingRepository;
             _authService = authService;
@@ -19,7 +19,6 @@ namespace ApplicationLayer.Service
         public async Task<int> CreateListingAsync(PropertyListing listingDTO)
         {
             var user = await _authService.GetUserDetails();
-            
             listingDTO.AddedBy = user.Id.ToString();
 
             var result = await _listingRepository.CreateListingAsync(listingDTO);
@@ -28,14 +27,22 @@ namespace ApplicationLayer.Service
 
         public async Task<PropertyListing> DeleteListingAsync(int id)
         {
-            var deletedListing = await _listingRepository.DeleteListingAsync(id);
+            var user = await _authService.GetUserDetails();
+            var deletedListing = await _listingRepository.DeleteListingAsync(id, user.Id);
             return deletedListing;
         }
 
         public async Task<IEnumerable<PropertyListing>> GetAllListingsAsync()
         {
-            var listings = await _listingRepository.GetAllListingsAsync();
-            return listings;
+            var user = await _authService.GetUserDetails();
+            var role = user.Id.ToString();
+            return await _listingRepository.GetAllListingsAsync();
+        }
+
+        public async Task<IEnumerable<PropertyListing>> GetAllListingsByUserId()
+        {
+            var user = await _authService.GetUserDetails();
+            return await _listingRepository.GetAllListingsByUserId(user.Id);
         }
 
         public async Task<PropertyListing> GetListingByIdAsync(int id)
@@ -53,11 +60,9 @@ namespace ApplicationLayer.Service
         public async Task<PropertyListing> UpdateListingAsync(int id, PropertyListing listingDto)
         {
             var user = await _authService.GetUserDetails();
-
             listingDto.UpdatedBy = user.Id.ToString();
 
-            var updatedListing = await _listingRepository.UpdateListingAsync(id, listingDto);
-
+            var updatedListing = await _listingRepository.UpdateListingAsync(id, listingDto, user.Id);
             return updatedListing;
         }
     }

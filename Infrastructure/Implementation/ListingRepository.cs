@@ -2,7 +2,6 @@
 using Core.UseCase;
 using Core.Repositories;
 using Infrastructure.Data;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Implementation
@@ -20,37 +19,37 @@ namespace Infrastructure.Implementation
         {
             _context.Property.Add(listingDTO);
             await _context.SaveChangesAsync();
-            return listingDTO.Id; 
+            return listingDTO.Id;
         }
 
         public async Task<IEnumerable<PropertyListing>> GetAllListingsAsync()
         {
             return await _context.Property
-                .Include(p=>p.ContactDetails).
-                Include(p=>p.Images)
-                .
-                ToListAsync();
+                .Include(p => p.ContactDetails)
+                .Include(p => p.Images)
+                .ToListAsync();
         }
 
         public async Task<PropertyListing> GetListingByIdAsync(int id)
         {
-            var list= await _context.Property
+            var list = await _context.Property
                 .Include(p => p.ContactDetails)
                 .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == id);
             return list;
         }
 
-        public async Task<PropertyListing> UpdateListingAsync(int id, PropertyListing listingDTO)
+        public async Task<PropertyListing> UpdateListingAsync(int id, PropertyListing listingDTO, string userId)
         {
             var existingListing = await _context.Property
+                .Where(p => p.AddedBy == userId)
                 .Include(p => p.ContactDetails)
                 .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (existingListing == null)
             {
-                return null; 
+                return null;
             }
 
             // Update specific properties directly
@@ -84,9 +83,13 @@ namespace Infrastructure.Implementation
             return existingListing;
         }
 
-        public async Task<PropertyListing> DeleteListingAsync(int id)
+        public async Task<PropertyListing> DeleteListingAsync(int id, string userId)
         {
-            var existingListing = await _context.Property.FindAsync(id);
+            var existingListing = await _context.Property
+                .Where(p => p.AddedBy == userId)
+                .Include(p => p.ContactDetails)
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (existingListing == null)
             {
@@ -102,15 +105,25 @@ namespace Infrastructure.Implementation
         public async Task<IEnumerable<PropertyListing>> SearchPropertiesAsync(PropertySearchCriteria criteria)
         {
             var query = _context.Property
-                        .Include(p => p.ContactDetails)
-                        .Include(p => p.Images)
-          .Where(p =>
-            (string.IsNullOrEmpty(criteria.Location) || p.Location.Contains(criteria.Location)) &&
-            (criteria.MinPrice == 0 || p.Price >= criteria.MinPrice) &&
-            (criteria.MaxPrice == 0 || p.Price <= criteria.MaxPrice) &&
-            (string.IsNullOrEmpty(criteria.PropertyType) || p.PropertyType == criteria.PropertyType));
+                .Include(p => p.ContactDetails)
+                .Include(p => p.Images)
+                .Where(p =>
+                    (string.IsNullOrEmpty(criteria.Location) || p.Location.Contains(criteria.Location)) &&
+                    (criteria.MinPrice == 0 || p.Price >= criteria.MinPrice) &&
+                    (criteria.MaxPrice == 0 || p.Price <= criteria.MaxPrice) &&
+                    (string.IsNullOrEmpty(criteria.PropertyType) || p.PropertyType == criteria.PropertyType));
 
             return await query.ToListAsync();
+        }
+
+        public async Task<IEnumerable<PropertyListing>> GetAllListingsByUserId(string userId)
+        {
+            var propertylist = await _context.Property
+                .Where(u => u.AddedBy == userId)
+                .Include(p => p.ContactDetails)
+                .Include(p => p.Images)
+                .ToListAsync();
+            return propertylist;
         }
     }
 }
