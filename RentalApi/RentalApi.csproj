@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	  
 	  <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0">
@@ -20,6 +21,10 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	  </PackageReference>
+
+	  <PackageReference Include="Polybioz.HtmlRenderer.PdfSharp.Core" Version="1.0.0" />
+
+	  <PackageReference Include="QuestPDF" Version="2023.12.6" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
