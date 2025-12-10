@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace RentalApi.DTOs
 {
-    public class UpdateProperty
+    public class AddPropertyDto
     {
         [Required(ErrorMessage = "Property type is required.")]
         public string PropertyType { get; set; }
@@ -16,6 +17,7 @@ namespace RentalApi.DTOs
 
         public string Features { get; set; }
 
+        [Required(ErrorMessage = "Contact details are required.")]
         public ContactDetailsDto ContactDetails { get; set; }
 
         // Assuming you're using ASP.NET Core for handling file uploads

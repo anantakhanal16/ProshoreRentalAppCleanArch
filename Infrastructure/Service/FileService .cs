@@ -1,6 +1,4 @@
-﻿// Infrastructure layer
-
-using Core.Interfaces;
+﻿using Core.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
@@ -28,7 +26,7 @@ public class FileService : IFileService
         // Append the desired subdirectory for property uploads
         var propertyUploads = Path.Combine(uploads, "Uploads", "Property");
         // Use a default path if WebRootPath is null
-     
+
 
         if (!Directory.Exists(propertyUploads))
         {
@@ -48,8 +46,6 @@ public class FileService : IFileService
 
     private string GetUniqueFileName(string fileName)
     {
-        return Path.GetFileNameWithoutExtension(fileName)
-               + "_" + Guid.NewGuid().ToString().Substring(0, 8)
-               + Path.GetExtension(fileName);
+        return Path.GetFileNameWithoutExtension(fileName) + "_" + Guid.NewGuid().ToString().Substring(0, 8) + Path.GetExtension(fileName);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace RentalApi.DTOs
+﻿using Microsoft.AspNetCore.Http;
+
+namespace RentalApi.DTOs
 {
     public class ImageDto
     {
